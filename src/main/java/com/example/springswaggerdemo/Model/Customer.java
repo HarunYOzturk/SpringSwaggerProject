@@ -1,6 +1,7 @@
 package com.example.springswaggerdemo.Model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,8 @@ public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+//    @JsonIgnore
+    @JsonInclude(value = JsonInclude.Include.CUSTOM)
     private Long id;
 
     @Column(name = "Customer Name", length = 100)

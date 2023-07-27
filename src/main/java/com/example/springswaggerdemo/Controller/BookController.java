@@ -1,10 +1,7 @@
 package com.example.springswaggerdemo.Controller;
 
-import com.example.springswaggerdemo.Model.Author;
 import com.example.springswaggerdemo.Model.Book;
-import com.example.springswaggerdemo.Repository.AuthorRepository;
 import com.example.springswaggerdemo.Repository.BookRepository;
-import com.example.springswaggerdemo.Repository.CustomerRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,17 +18,16 @@ public class BookController {
 
     @Autowired
     private  BookRepository bookRepository;
-    @Autowired
-    private AuthorRepository authorRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
+
 
 
     @GetMapping("/getAllBooks")
     public ResponseEntity<List<Book>> getAllBooks(){
         try {
             List<Book> bookList = new ArrayList<>(bookRepository.findAll());
+
             if(bookList.isEmpty()) return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
             return new ResponseEntity<>(bookList, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

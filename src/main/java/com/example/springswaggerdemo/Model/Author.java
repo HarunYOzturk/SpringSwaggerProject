@@ -26,10 +26,17 @@ public class Author {
     @OneToMany(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL,
-//            mappedBy = "author",
             targetEntity = Book.class
     )
     @JsonIgnore
     private Set<Book> books =new HashSet<>();
+
+
+    public void addBook(Book book){
+        this.books.add(book);
+    }
+    public void removeBook(Book book){
+        this.books.remove(book);
+    }
 
 }
