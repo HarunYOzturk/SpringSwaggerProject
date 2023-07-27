@@ -2,6 +2,7 @@ package com.example.springswaggerdemo.Controller.ModifiedController;
 
 import com.example.springswaggerdemo.Model.Author;
 import com.example.springswaggerdemo.Model.Book;
+import com.example.springswaggerdemo.Model.Customer;
 import com.example.springswaggerdemo.Repository.AuthorRepository;
 import com.example.springswaggerdemo.Repository.BookRepository;
 //import com.example.springswaggerdemo.Repository.CustomerRepository;
@@ -18,31 +19,33 @@ import java.util.Optional;
 @RestController
 public class ModifiedOperationsAuthorController {
 
-    @Autowired
-    private AuthorRepository authorRepository;
+
 //    @Autowired
 //    private CustomerRepository customerRepository;
+
+
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+
     @Autowired
-    private BookRepository bookRepository;
+    public ModifiedOperationsAuthorController(AuthorRepository authorRepository, BookRepository bookRepository) {
+        this.authorRepository = authorRepository;
+        this.bookRepository = bookRepository;
+    }
 
 
 
-    @PutMapping("/writeBook/{id}")
-    public ResponseEntity<Object> writeBook(@PathVariable Long id, @RequestBody Book newBook){
+    @PutMapping("/writeBook/{authorId}")
+    public ResponseEntity<Object> writeBook(@PathVariable Long authorId, @RequestBody Book newBook){
         String msg ="Could not add the book";
         try{
-            if(authorRepository.findById(id).isEmpty())
-            {
-                msg = "Not valid Author ID";
-                throw new Exception();
-            }
-            Author authorObj = authorRepository.findById(id).get();
-            authorObj.addBook(newBook);
-            newBook.setAuthor(authorObj);
-            Book bookObj = bookRepository.save(newBook);
-            authorRepository.save(authorObj);
-            return new ResponseEntity<>(bookObj, HttpStatus.OK);
+            Author author = getAuthorById(authorId);
+            newBook.setAuthor(author);
+            author.addBook(newBook);
+            authorRepository.save(author);
+            return new ResponseEntity<>(newBook, HttpStatus.OK);
         }catch (Exception e){
+            e.printStackTrace();
             return new ResponseEntity<>(msg,HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -51,28 +54,15 @@ public class ModifiedOperationsAuthorController {
     public ResponseEntity<Object> assignTheAuthor(@PathVariable Long authorId, @RequestParam Long bookId){
         String msg ="Could not assigned the author";
         try{
-            Optional<Author> author =authorRepository.findById(authorId);
-            Optional<Book> book =bookRepository.findById(bookId);
+            Author author = getAuthorById(authorId);
+            Book book = getBookById(bookId);
 
-            if(author.isEmpty())
-            {
-                msg = "Not valid Author ID";
-                throw new Exception();
-            }
-            Author authorObj = author.get();
-            if(book.isEmpty())
-            {
-                msg = "Not valid Book ID";
-                throw new Exception();
-            }
-            Book bookObj = book.get();
-
-            if(Objects.isNull(bookObj.getAuthor())) {
-                authorObj.addBook(bookObj);
-                bookObj.setAuthor(authorObj);
-                authorRepository.save(authorObj);
-                bookRepository.save(bookObj);
-                return new ResponseEntity<>(bookObj, HttpStatus.OK);
+            if(Objects.isNull(book.getAuthor())) {
+                author.addBook(book);
+                book.setAuthor(author);
+                authorRepository.save(author);
+                bookRepository.save(book);
+                return new ResponseEntity<>(book, HttpStatus.OK);
             }
             msg = "The Book has an author already";
             throw new RuntimeException();
@@ -85,39 +75,43 @@ public class ModifiedOperationsAuthorController {
     public ResponseEntity<Object> changeTheAuthor(@PathVariable Long authorId, @RequestParam Long bookId){
         String msg ="Could not assigned the author";
         try{
-            Optional<Author> author =authorRepository.findById(authorId);
-            Optional<Book> book =bookRepository.findById(bookId);
-            if(author.isEmpty())
-            {
-                msg = "Not valid Author ID ";
-                throw new Exception();
-            }
-            Author authorObj = author.get();
-            if(book.isEmpty())
-            {
-                msg = "Not valid Book ID";
-                throw new Exception();
-            }
-            Book bookObj = book.get();
 
-            Author otherAuthorObj =bookObj.getAuthor();
-            if(otherAuthorObj == null ) {
-                msg ="The Book already doesn't have an author try to assign author instead of changing.";
+            Author author = getAuthorById(authorId);
+            Book book = getBookById(bookId);
+
+            Author otherAuthor =book.getAuthor();
+            if(otherAuthor == null ) {
+                msg ="The Book doesn't have an author try to assign author instead of changing.";
                 throw new RuntimeException();
             }
 
-            otherAuthorObj.removeBook(bookObj);
-            bookObj.setAuthor(authorObj);
-            bookRepository.save(bookObj);
+            otherAuthor.removeBook(book);
+            book.setAuthor(author);
+            bookRepository.save(book);
 
-            authorObj.addBook(bookObj);
-            authorRepository.save(otherAuthorObj);
-            authorRepository.save(authorObj);
+            author.addBook(book);
+            authorRepository.save(otherAuthor);
+            authorRepository.save(author);
 
 
-            return new ResponseEntity<>(bookObj, HttpStatus.OK);
+            return new ResponseEntity<>(book, HttpStatus.OK);
         }catch (Exception e){
             return new ResponseEntity<>(msg,HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private Book getBookById(Long bookId) throws Exception {
+        Optional<Book> bookOptional = bookRepository.findById(bookId);
+        if (bookOptional.isEmpty()) {
+            throw new Exception("Not valid Author ID");
+        }
+        return bookOptional.get();
+    }
+    private Author getAuthorById(Long customerId) throws Exception {
+        Optional<Author> authorOptional = authorRepository.findById(customerId);
+        if (authorOptional.isEmpty()) {
+            throw new Exception("Not valid Customer ID");
+        }
+        return authorOptional.get();
     }
 }
