@@ -54,14 +54,14 @@ public class BookController {
     @PutMapping("/updateBookById/{id}")
     public ResponseEntity<Book> updateBookById(@PathVariable Long id, @RequestBody Book newBookData){
         Optional<Book> oldBookData = bookRepository.findById(id);
-        Optional<Author> author= authorRepository.findById(newBookData.getAuthor().getId());
+//        Optional<Author> author= authorRepository.findById(newBookData.getAuthor().getId());
 
 
         if(oldBookData.isPresent()){
             Book updatedBookData =oldBookData.get();
             if(!newBookData.getTitle().isEmpty()) updatedBookData.setTitle(newBookData.getTitle());
-            if(!newBookData.getCustomers().isEmpty()) updatedBookData.setCustomers(newBookData.getCustomers());
-            if(newBookData.getAuthor() != null) updatedBookData.setAuthor(author.get());
+//            if(!newBookData.getCustomers().isEmpty()) updatedBookData.setCustomers(newBookData.getCustomers());
+//            if(newBookData.getAuthor() != null) updatedBookData.setAuthor(author.get());
 
             Book book = bookRepository.save(updatedBookData);
             return new ResponseEntity<>(book,HttpStatus.OK);

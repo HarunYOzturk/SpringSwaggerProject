@@ -1,6 +1,7 @@
 package com.example.springswaggerdemo.Model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,7 @@ public class Book {
             fetch = FetchType.LAZY,
             targetEntity = Customer.class
     )
+    @JsonIgnore
     private Set<Customer> customers =new HashSet<>();
 
 //    @JoinColumn(name = "Books Author", length = 100)
@@ -37,6 +39,7 @@ public class Book {
             fetch = FetchType.LAZY
 
     )
+    @JsonIgnore
     private Author author;
 
 }

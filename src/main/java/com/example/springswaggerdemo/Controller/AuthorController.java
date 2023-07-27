@@ -1,6 +1,7 @@
 package com.example.springswaggerdemo.Controller;
 
 import com.example.springswaggerdemo.Model.Author;
+import com.example.springswaggerdemo.Model.Book;
 import com.example.springswaggerdemo.Repository.AuthorRepository;
 import com.example.springswaggerdemo.Repository.BookRepository;
 import com.example.springswaggerdemo.Repository.CustomerRepository;
@@ -58,14 +59,16 @@ public class AuthorController {
         if(oldAuthorData.isPresent()){
             Author updatedAuthorData =oldAuthorData.get();
             if(!newAuthorData.getName().isEmpty()) updatedAuthorData.setName(newAuthorData.getName());
-            if(!newAuthorData.getBooks().isEmpty()) updatedAuthorData.setBooks(newAuthorData.getBooks());
+//            if(!newAuthorData.getBooks().isEmpty()) updatedAuthorData.setBooks(newAuthorData.getBooks());
 
             Author author = authorRepository.save(updatedAuthorData);
             return new ResponseEntity<>(author,HttpStatus.OK);
         }
-
+        //instead not found throw exception
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+
+
 
     @DeleteMapping("/deleteAuthorById/{id}")
     public ResponseEntity<HttpStatus> deleteAuthorById(@PathVariable Long id){
